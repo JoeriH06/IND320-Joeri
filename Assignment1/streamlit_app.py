@@ -7,8 +7,7 @@ st.title("Welcome to My Streamlit App 🎉")
 st.write("This is a minimal working example connected to my GitHub repo.")
 
 st.header("About this project")
-st.markdown(
-)
+st.markdown("hello")
 
 st.header("Demo interaction")
 name = st.text_input("Enter your name")
