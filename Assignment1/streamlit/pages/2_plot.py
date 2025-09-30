@@ -6,16 +6,28 @@ st.title("Plot")
 st.write("ℹ️ Plot the imported data with column and month selection.")
 
 @st.cache_data
-def load_data(path: str) -> pd.DataFrame:
-    # Here we load the CSV and normalize the time column to datetime (UTC)
-    df = pd.read_csv(path)
+def load_data() -> pd.DataFrame:
+    # Here we load the dataset from the subfolder and use caching for efficiency
+    # pages -> streamlit -> Data/open-meteo-subset.csv
+    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open-meteo-subset.csv"
+
+    # Here we do a quick existence check to surface a clear error if the file is missing
+    if not csv_path.exists():
+        raise FileNotFoundError(f"CSV not found at: {csv_path}")
+
+    df = pd.read_csv(csv_path)
+    # Here we change the time column to datetime (yyyy-mm-dd) for consistency
     if "time" in df.columns:
         df["time"] = pd.to_datetime(df["time"], errors="coerce", utc=True)
     return df
 
 # Here we load the dataset from the subfolder and use caching for efficiency
-data = load_data("../../Data/open-meteo-subset.csv")
-
+try:
+    data = load_data()
+except Exception as e:
+    st.error(f"Failed to load data: {e}")
+    st.stop()
+    
 # Here we validate the time column so that .dt operations are safe.
 if "time" not in data.columns or not pd.api.types.is_datetime64_any_dtype(data["time"]):
     st.error("The 'time' column could not be parsed as datetime.")

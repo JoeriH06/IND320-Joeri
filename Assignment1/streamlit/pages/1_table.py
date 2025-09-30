@@ -5,16 +5,28 @@ st.title("Table")
 st.write("ℹ️ One row per series, with a mini line chart for the first month.")
 
 @st.cache_data
-def load_data(path) -> pd.DataFrame:
-    df = pd.read_csv(path)
+def load_data() -> pd.DataFrame:
+    # Here we load the dataset from the subfolder and use caching for efficiency
+    # pages -> streamlit -> Data/open-meteo-subset.csv
+    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open-meteo-subset.csv"
+
+    # Here we do a quick existence check to surface a clear error if the file is missing
+    if not csv_path.exists():
+        raise FileNotFoundError(f"CSV not found at: {csv_path}")
+
+    df = pd.read_csv(csv_path)
     # Here we change the time column to datetime (yyyy-mm-dd) for consistency
     if "time" in df.columns:
         df["time"] = pd.to_datetime(df["time"], errors="coerce", utc=True)
     return df
 
 # Here we load the dataset from the subfolder and use caching for efficiency
-data = load_data("../../Data/open-meteo-subset.csv")
-
+try:
+    data = load_data()
+except Exception as e:
+    st.error(f"Failed to load data: {e}")
+    st.stop()
+    
 # Here we put the raw data (from cache) in an expanding table to show that caching worked
 with st.expander("Raw imported data", expanded=False):
     st.dataframe(data, use_container_width=True)
