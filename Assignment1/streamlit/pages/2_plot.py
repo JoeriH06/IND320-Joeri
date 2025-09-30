@@ -8,14 +8,14 @@ st.write("ℹ️ Plot the imported data with column and month selection.")
 @st.cache_data
 def load_data(path: str) -> pd.DataFrame:
     # Here we load the CSV and normalize the time column to datetime (UTC)
-    df = pd.read_csv(path)
+    csv_path = Path(__file__).resolve().parents[2] / "Data" / "open-meteo-subset.csv"
+    df = pd.read_csv(csv_path)
     if "time" in df.columns:
         df["time"] = pd.to_datetime(df["time"], errors="coerce", utc=True)
     return df
 
 # Here we load the dataset from the subfolder and use caching for efficiency
-data = load_data("../../Data/open-meteo-subset.csv")
-
+data = load_data()
 # Here we validate the time column so that .dt operations are safe.
 if "time" not in data.columns or not pd.api.types.is_datetime64_any_dtype(data["time"]):
     st.error("The 'time' column could not be parsed as datetime.")
