@@ -14,7 +14,7 @@ def load_data(path: str) -> pd.DataFrame:
     return df
 
 # Here we load the dataset from the subfolder and use caching for efficiency
-data = load_data("../Data/open-meteo-subset.csv")
+data = load_data("../../Data/open-meteo-subset.csv")
 
 # Here we validate the time column so that .dt operations are safe.
 if "time" not in data.columns or not pd.api.types.is_datetime64_any_dtype(data["time"]):

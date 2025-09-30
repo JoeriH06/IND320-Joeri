@@ -13,7 +13,7 @@ def load_data(path) -> pd.DataFrame:
     return df
 
 # Here we load the dataset from the subfolder and use caching for efficiency
-data = load_data("../Data/open-meteo-subset.csv")
+data = load_data("../../Data/open-meteo-subset.csv")
 
 # Here we put the raw data (from cache) in an expanding table to show that caching worked
 with st.expander("Raw imported data", expanded=False):
