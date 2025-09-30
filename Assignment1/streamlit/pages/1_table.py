@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 
 st.title("Table")
 st.write("ℹ️ One row per series, with a mini line chart for the first month.")
