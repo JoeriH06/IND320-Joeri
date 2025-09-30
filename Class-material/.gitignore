@@ -1,0 +1,11 @@
+# Don't sync folder No_sync
+No_sync/
+
+# Ignore Mac files
+.DS_Store
+
+# Ignore .ipynb_checkpoints
+.ipynb_checkpoints
+
+# Ignore pycache
+__pycache__

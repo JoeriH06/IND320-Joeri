@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -202,13 +202,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../1_Formats/3_Streaming_data.html">Streaming data</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="1_Databases.html">Databases</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">MySQL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="3_Cassandra.html">Cassandra</a></li>
-<li class="toctree-l2"><a class="reference internal" href="4_Spark.html">Spark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="5_MongoDB.html">MongoDB</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="1_Databases.html">Databases</a></li>
+
 <li class="toctree-l1 has-children"><a class="reference internal" href="../3_APIs/1_APIs.html">APIs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../3_APIs/2_REST.html">REST API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../3_APIs/3_OpenWeatherMap.html">Demonstration of API using OpenWeatherMap.org</a></li>
@@ -532,7 +527,7 @@ document.write(`
 <h2>Instructor’s database<a class="headerlink" href="#instructors-database" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>An example of accessing an online, editable database.</p></li>
-<li><p>Some VPN connections block the chosen port.</p></li>
+<li><p>Some VPN connections block the chosen port, e.g., NMBU’s network.</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -543,7 +538,7 @@ document.write(`
 
 <span class="c1"># Establishing a connection to the MySQL database</span>
 <span class="n">connection</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;srv1748.hstgr.io&#39;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;195.35.53.47&#39;</span><span class="p">,</span> <span class="c1">#&#39;srv1748.hstgr.io&#39;,</span>
     <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span>
     <span class="n">user</span><span class="o">=</span><span class="s1">&#39;u492297623_stud1&#39;</span><span class="p">,</span>
     <span class="n">password</span><span class="o">=</span><span class="n">PWD</span><span class="p">,</span>
@@ -729,7 +724,7 @@ document.write(`
 <h2>Exercise<a class="headerlink" href="#exercise" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Make a Python function that takes an SQL query as input, opens a connection, executes the statement, closes the connection and returns any results.</p></li>
-<li><p>Assume that password, username, database name, etc. are stored in a dictionary. Make another version of the function that takes a query and the dictionary as input and returns any results.</p></li>
+<li><p>Assume that password, username, database name, etc. are stored in a dictionary inside the function. Make another version of the function that takes a query and the dictionary as input and returns any results.</p></li>
 <li><p>Test both functions with SELECT and INSERT INTO statements.</p></li>
 </ol>
 <div class="tip admonition seealso">
@@ -737,7 +732,7 @@ document.write(`
 <h2 class="rubric" id="resources">Resources</h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.mysql.com/">MySQL webpage</a></p></li>
-<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/MySQL">Wikipedia: MySQL</a>.</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/MySQL">Wikipedia: MySQL</a></p></li>
 <li><p><a class="reference external" href="https://youtu.be/Cz3WcZLRaWc?si=D5CQt3CSSmUg1jkV">YouTube: MySQL - The basics // Learn SQL in 23 Easy Steps</a> (17m:16s)</p></li>
 <li><p><a class="reference external" href="https://www.sqltutorial.org/sql-cheat-sheet/">SQL Cheat Sheet</a> with tons of examples from <a class="reference external" href="https://www.sqltutorial.org/">SQL Tutorial</a></p></li>
 </ul>

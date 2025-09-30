@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -202,13 +202,8 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Streaming data</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../2_Databases/1_Databases.html">Databases</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../2_Databases/2_MySQL.html">MySQL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../2_Databases/3_Cassandra.html">Cassandra</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../2_Databases/4_Spark.html">Spark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../2_Databases/5_MongoDB.html">MongoDB</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../2_Databases/1_Databases.html">Databases</a></li>
+
 <li class="toctree-l1 has-children"><a class="reference internal" href="../3_APIs/1_APIs.html">APIs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../3_APIs/2_REST.html">REST API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../3_APIs/3_OpenWeatherMap.html">Demonstration of API using OpenWeatherMap.org</a></li>
@@ -534,7 +529,7 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check if user is logged in (&quot;==&quot; active chat)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-<span class="n">user</span> <span class="o">=</span> <span class="s2">&quot;k3soju&quot;</span> <span class="c1"># Change this to the user you want to check, e.g., epicdan22, zackrawrr, summit1g, </span>
+<span class="n">user</span> <span class="o">=</span> <span class="s2">&quot;summit1g&quot;</span> <span class="c1"># Change this to the user you want to check, e.g., epicdan22, zackrawrr, summit1g, </span>
 <span class="c1"># mizkif, cohhcarnage, k3soju, etc.</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://decapi.me/twitch/uptime/&quot;</span><span class="o">+</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
 <span class="n">is_online</span> <span class="o">=</span> <span class="n">response</span> <span class="o">!=</span> <span class="n">user</span><span class="o">+</span><span class="s2">&quot; is offline&quot;</span>
@@ -543,7 +538,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
 </pre></div>
 </div>
 </div>
@@ -579,35 +574,6 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 20, 201671), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;ashtaroxx&#39;, &#39;msg&#39;: &#39;plink akali is a negative fon&#39;}
-{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 20, 383682), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;windofmemory&#39;, &#39;msg&#39;: &#39;why he complain about trifecta like its op&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 20, 563937), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;nightbot&#39;, &#39;msg&#39;: &#39;HahaThink&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 21, 804456), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;qqjr&#39;, &#39;msg&#39;: &#39;akali&#39;}
-{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 21, 990011), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;thekozmoz&#39;, &#39;msg&#39;: &#39;BAN&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 22, 171335), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;enytaralc&#39;, &#39;msg&#39;: &#39;LO&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 22, 680041), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;greennedle1776&#39;, &#39;msg&#39;: &#39;its artficaft anvil primatic&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 24, 580255), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;setonsan&#39;, &#39;msg&#39;: &#39;Move on, lock in&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 25, 314046), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;cyclyc1&#39;, &#39;msg&#39;: &#39;nerf = kill RIOT&#39;}
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dt&#39;: datetime.datetime(2025, 9, 8, 9, 20, 26, 906059), &#39;channel&#39;: &#39;k3soju&#39;, &#39;username&#39;: &#39;hailos_&#39;, &#39;msg&#39;: &#39;@k3soju did you eat breakfast today?&#39;}
-Puh, that&#39;s enough!
-</pre></div>
-</div>
-</div>
 </div>
 <section id="comments">
 <h3>Comments<a class="headerlink" href="#comments" title="Link to this heading">#</a></h3>
@@ -624,9 +590,9 @@ Puh, that&#39;s enough!
 </section>
 <section id="exercise">
 <h2>Exercise<a class="headerlink" href="#exercise" title="Link to this heading">#</a></h2>
-<p>Make a clock  using <a class="reference external" href="http://worldtimeapi.org/">World Time API</a></p>
+<p>Make a clock  using <a class="reference external" href="http://timeapi.io/">TimeAPI.io</a></p>
 <ul class="simple">
-<li><p>Pull the current time from _<a class="reference external" href="http://worldtimeapi.org/api/timezone/Europe/Oslo_">http://worldtimeapi.org/api/timezone/Europe/Oslo_</a> every second using <em>requests.get()</em>.</p></li>
+<li><p>Pull the current time from _<a class="reference external" href="https://timeapi.io/api/time/current/zone?timeZone=Europe%2FOslo_">https://timeapi.io/api/time/current/zone?timeZone=Europe%2FOslo_</a> every second using <em>requests.get()</em>.</p></li>
 <li><p>Print only the <em>hours:minutes:seconds.decimals</em></p></li>
 <li><p>Print an error message if this fails.</p></li>
 <li><p>Stop after 10 seconds</p></li>
