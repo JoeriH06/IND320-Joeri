@@ -1,0 +1,79 @@
+Metadata-Version: 2.1
+Name: elhub-python-sdk
+Version: 0.1.5
+Summary: Non official Python SDK for ElHub API.
+Home-page: https://github.com/bkkas/elhub-python-sdk
+License: GPL-3.0-only
+Author: Volte
+Author-email: jesus.condon@eviny.no
+Requires-Python: >=3.8.2,<4.0
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.8
+Provides-Extra: dev
+Provides-Extra: doc
+Provides-Extra: test
+Requires-Dist: black (>=22.8.0,<23.0.0) ; extra == "test"
+Requires-Dist: bump2version (>=1.0.1,<2.0.0) ; extra == "dev"
+Requires-Dist: flake8 (>=5.0.4,<6.0.0) ; extra == "test"
+Requires-Dist: flake8-docstrings (>=1.6.0,<2.0.0) ; extra == "test"
+Requires-Dist: isort (>=5.10.1,<6.0.0) ; extra == "test"
+Requires-Dist: mkdocs (>=1.3.1,<2.0.0) ; extra == "doc"
+Requires-Dist: mkdocs-autorefs (>=0.4.1,<0.5.0) ; extra == "doc"
+Requires-Dist: mkdocs-include-markdown-plugin (>=3.8.1,<4.0.0) ; extra == "doc"
+Requires-Dist: mkdocs-material (>=8.5.3,<9.0.0) ; extra == "doc"
+Requires-Dist: mkdocs-material-extensions (>=1.0.3,<2.0.0)
+Requires-Dist: mkdocstrings[python-legacy] (>=0.19.0,<0.20.0) ; extra == "doc"
+Requires-Dist: mypy (>=0.971,<0.972) ; extra == "test"
+Requires-Dist: pip (>=22.2.2,<23.0.0) ; extra == "dev"
+Requires-Dist: pre-commit (>=2.20.0,<3.0.0) ; extra == "dev"
+Requires-Dist: pytest (>=7.1.3,<8.0.0) ; extra == "test"
+Requires-Dist: pytest-cov (>=3.0.0,<4.0.0) ; extra == "test"
+Requires-Dist: python-dotenv (>=0.21.0,<0.22.0)
+Requires-Dist: toml (>=0.10.2,<0.11.0) ; extra == "dev"
+Requires-Dist: tox (>=3.26.0,<4.0.0) ; extra == "dev"
+Requires-Dist: twine (>=4.0.1,<5.0.0) ; extra == "dev"
+Requires-Dist: virtualenv (>=20.16.5,<21.0.0) ; extra == "dev"
+Requires-Dist: zeep[xmlsec] (>=4.1.0,<5.0.0)
+Description-Content-Type: text/markdown
+
+# Non official Python SDK for ElHub API
+
+[![pypi](https://img.shields.io/pypi/v/elhub-python-sdk.svg)](https://pypi.org/project/elhub-python-sdk/)
+[![python](https://img.shields.io/pypi/pyversions/elhub-python-sdk.svg)](https://pypi.org/project/elhub-python-sdk/)
+[![Build Status](https://github.com/bkkas/elhub-python-sdk/actions/workflows/dev.yml/badge.svg)](https://github.com/bkkas/elhub-python-sdk/actions/workflows/dev.yml)
+
+
+Welcome to the **non official** Open Source Python SDK for ElHub API.
+
+The objective is to create an SDK that will improve the speed and quality of the development against the ElHub API,
+supported by the community.
+
+We are at a very early stage of development, we welcome all the contributions in any kind, please have a look
+at the following if you are interested.
+
+
+## Contributing
+
+* Documentation: <https://bkkas.github.io/elhub-python-sdk>
+* GitHub: <https://github.com/bkkas/elhub-python-sdk>
+* GitHub: <https://github.com/bkkas/elhub-python-sdk/discussions>
+* PyPI: <https://pypi.org/project/elhub-python-sdk/>
+
+
+## License
+
+LGPL-3.0
+
+
+## Credits
+
+This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and
+the [waynerv/cookiecutter-pypackage](https://github.com/waynerv/cookiecutter-pypackage) project template.
+
