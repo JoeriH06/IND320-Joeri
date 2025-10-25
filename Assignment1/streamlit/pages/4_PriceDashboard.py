@@ -3,6 +3,7 @@ import pandas as pd
 import certifi
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure, ServerSelectionTimeoutError
+import plotly.express as px
 
 @st.cache_resource(show_spinner=True)
 def get_mongo_client():
