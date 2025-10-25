@@ -1,36 +1,21 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import urllib.parse
+import certifi
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure, ServerSelectionTimeoutError
-import certifi
-
-
-st.set_page_config(page_title="Price Dashboard", page_icon="💹", layout="wide")
-
-# ---------- MONGODB CONNECTION ----------
-HOST_DEFAULT = "cluster1.vihi1ie.mongodb.net"
-APPNAME_DEFAULT = "cluster1"
 
 @st.cache_resource(show_spinner=True)
 def get_mongo_client():
-    cfg = st.secrets["mongo"]
-    return MongoClient(
-        cfg["uri"],
-        tlsCAFile=certifi.where(),             # <- key change
-        serverSelectionTimeoutMS=8000,
-    )
+    uri = st.secrets["mongo"]["uri"]
+    return MongoClient(uri, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=8000)
 
 @st.cache_data(ttl=600, show_spinner=True)
 def load_data() -> pd.DataFrame:
     cfg = st.secrets["mongo"]
     client = get_mongo_client()
-    db = client[cfg.get("database", "elhub")]
-    coll = db[cfg.get("collection", "df")]
+    coll = client[cfg.get("database", "elhub")][cfg.get("collection", "df")]
     try:
-        data = list(coll.find({}, {"_id": 0}))
-        return pd.DataFrame(data)
+        return pd.DataFrame(list(coll.find({}, {"_id": 0})))
     except OperationFailure:
         st.cache_resource.clear()
         st.error("❌ MongoDB auth failed.")
