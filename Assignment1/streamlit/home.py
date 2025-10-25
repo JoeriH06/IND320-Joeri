@@ -1,5 +1,5 @@
 import streamlit as st
-
+st.write("secrets keys:", list(st.secrets.keys()))
 st.set_page_config(page_title="IND320 Project", page_icon="📊", layout="centered")
 st.title("Home")
 st.markdown("---")
