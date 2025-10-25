@@ -3,7 +3,9 @@ import pandas as pd
 import plotly.express as px
 import urllib.parse
 from pymongo import MongoClient
-from pymongo.errors import OperationFailure
+from pymongo.errors import OperationFailure, ServerSelectionTimeoutError
+import certifi
+
 
 st.set_page_config(page_title="Price Dashboard", page_icon="💹", layout="wide")
 
@@ -11,33 +13,32 @@ st.set_page_config(page_title="Price Dashboard", page_icon="💹", layout="wide"
 HOST_DEFAULT = "cluster1.vihi1ie.mongodb.net"
 APPNAME_DEFAULT = "cluster1"
 
-@st.cache_resource(show_spinner=False)
-def get_mongo_client() -> MongoClient:
+@st.cache_resource(show_spinner=True)
+def get_mongo_client():
     cfg = st.secrets["mongo"]
-    uri = cfg.get("uri")
-    if not uri or "mongodb+srv://" not in uri:
-        user = cfg["user"]
-        password = urllib.parse.quote_plus(cfg["password"])
-        dbname = cfg.get("database", "elhub")
-        uri = (
-            f"mongodb+srv://{user}:{password}@{HOST_DEFAULT}/"
-            f"{dbname}?retryWrites=true&w=majority&appName={APPNAME_DEFAULT}"
-        )
-    return MongoClient(uri, tls=True, serverSelectionTimeoutMS=8000)
+    return MongoClient(
+        cfg["uri"],
+        tlsCAFile=certifi.where(),             # <- key change
+        serverSelectionTimeoutMS=8000,
+    )
 
 @st.cache_data(ttl=600, show_spinner=True)
 def load_data() -> pd.DataFrame:
     cfg = st.secrets["mongo"]
     client = get_mongo_client()
     db = client[cfg.get("database", "elhub")]
-    collection = db[cfg.get("collection", "df")]
+    coll = db[cfg.get("collection", "df")]
     try:
-        data = list(collection.find({}, {"_id": 0}))
-    except OperationFailure as e:
+        data = list(coll.find({}, {"_id": 0}))
+        return pd.DataFrame(data)
+    except OperationFailure:
         st.cache_resource.clear()
-        st.error(f"❌ MongoDB authentication failed: {getattr(e, 'details', {}) or str(e)}")
-        st.stop()
-
+        st.error("❌ MongoDB auth failed.")
+        raise
+    except ServerSelectionTimeoutError:
+        st.cache_resource.clear()
+        st.error("❌ Cannot reach MongoDB (network/TLS). Check Atlas IP allowlist and TLS/CA.")
+        raise
     df = pd.DataFrame(data)
     if df.empty:
         st.error("⚠️ No data found in MongoDB. Check your database/collection names.")
