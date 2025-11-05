@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+altair
+plotly
+pymongo
+pyspark
+pymongo[srv]==4.10.1
+dnspython==2.6.1
+certifi==2024.8.30
