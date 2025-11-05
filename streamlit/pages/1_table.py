@@ -9,7 +9,7 @@ st.write("ℹ️ One row per series, with a mini line chart for the first month.
 def load_data() -> pd.DataFrame:
     # Here we load the dataset from the subfolder and use caching for efficiency
     # pages -> streamlit -> Data/open-meteo-clean.csv
-    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open-meteo-clean.csv"
+    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open_meteo_clean.csv"
 
     # Here we do a quick existence check to surface a clear error if the file is missing
     if not csv_path.exists():

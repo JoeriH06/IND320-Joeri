@@ -1,119 +1,106 @@
-# --------------------- Page 4: Two-Column Analysis --------------------------
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from pymongo import MongoClient
+import certifi
 
-def render_page_four(df: pd.DataFrame):
-    # Ensure expected columns and normalized types
-    df = df.copy()
-    df.columns = [c.lower() for c in df.columns]
-    required = {"pricearea", "productiongroup", "starttime", "quantitykwh"}
-    missing = required - set(df.columns)
-    if missing:
-        st.error(f"❌ Missing required columns in your data: {sorted(missing)}")
-        st.stop()
+st.set_page_config(page_title="Price Dashboard", layout="wide")
 
-    df["starttime"] = pd.to_datetime(df["starttime"], errors="coerce", utc=True)
-    df = df.dropna(subset=["starttime"])
-    df["quantitykwh"] = pd.to_numeric(df["quantitykwh"], errors="coerce").fillna(0.0)
-    df["month"] = df["starttime"].dt.month
 
-    month_names = {
-        1: "January", 2: "February", 3: "March", 4: "April",
-        5: "May", 6: "June", 7: "July", 8: "August",
-        9: "September", 10: "October", 11: "November", 12: "December"
-    }
+@st.cache_data(ttl=300, show_spinner=True)
+def load_df_from_mongo() -> pd.DataFrame:
+    cfg = st.secrets["mongo"]
+    client = MongoClient(cfg["uri"], tlsCAFile=certifi.where(), serverSelectionTimeoutMS=8000)
+    client.admin.command("ping")
+    col = client[cfg.get("database", "elhub")][cfg.get("collection", "df_clean")]
+    df = pd.DataFrame(list(col.find({}, {"_id": 0})))
+    return df
 
-    st.markdown("### Page 4 — Left/Right Split")
+with st.spinner("Loading data from MongoDB…"):
+    df = load_df_from_mongo()
 
-    left, right = st.columns(2, gap="large")
+if df.empty:
+    st.error("No data in MongoDB collection.")
+    st.stop()
 
-    # -------- Left: price area radio + pie chart --------------------------------
-    with left:
-        st.subheader("Area & Composition")
-        price_areas = sorted(df["pricearea"].dropna().unique().tolist())
-        if not price_areas:
-            st.warning("No price areas found in data.")
-            st.stop()
 
-        area = st.radio("Select price area", price_areas, index=0, key="p4_area")
+df = df.copy()
+expected = {"pricearea","productiongroup","starttime","quantitykwh"}
+missing = expected - set(df.columns)
+if missing:
+    st.error(f"Missing required columns in Mongo: {sorted(missing)}")
+    st.stop()
 
-        # Pie = share by production group for the selected area (whole year)
-        pie_data = (
-            df[df["pricearea"] == area]
-            .groupby("productiongroup", as_index=False)["quantitykwh"]
-            .sum()
-            .sort_values("quantitykwh", ascending=False)
-        )
-        if pie_data.empty:
-            st.info("No data for the selected price area.")
-        else:
-            fig_pie = px.pie(
-                pie_data,
-                values="quantitykwh",
-                names="productiongroup",
-                title=f"Production share — {area}",
-            )
-            st.plotly_chart(fig_pie, use_container_width=True)
+df["starttime"]   = pd.to_datetime(df["starttime"], utc=True, errors="coerce")
+df["quantitykwh"] = pd.to_numeric(df["quantitykwh"], errors="coerce")
+df = df.dropna(subset=["starttime","quantitykwh"])
+df["month"] = df["starttime"].dt.month
 
-    # -------- Right: pills + month selector + line plot -------------------------
-    with right:
-        st.subheader("Groups & Monthly Trend")
+st.caption(f"Loaded {len(df):,} rows from "
+           f"{st.secrets['mongo'].get('database','elhub')}.{st.secrets['mongo'].get('collection','df_clean')}")
 
-        # Groups selector (pills if available, else multiselect)
-        all_groups = sorted(df["productiongroup"].dropna().unique().tolist())
-        if hasattr(st, "pills"):
-            selected_groups = st.pills(
-                "Production group(s)",
-                options=all_groups,
-                selection_mode="multi",
-                default=all_groups,
-                key="p4_groups",
-            )
-        else:
-            selected_groups = st.multiselect(
-                "Production group(s)", options=all_groups, default=all_groups, key="p4_groups"
-            )
+# ---------- UI ----------
+st.markdown("### Page 4 — Left/Right Split")
+month_names = {
+    1:"January",2:"February",3:"March",4:"April",5:"May",6:"June",
+    7:"July",8:"August",9:"September",10:"October",11:"November",12:"December"
+}
 
-        # Month selector
-        sel_month = st.selectbox(
-            "Month",
-            options=list(month_names.keys()),
-            index=0,
-            format_func=lambda m: month_names[m],
-            key="p4_month",
+left, right = st.columns(2, gap="large")
+
+# Left: area radio + pie
+with left:
+    st.subheader("Area & Composition")
+    price_areas = sorted(df["pricearea"].dropna().unique())
+    area = st.radio("Select price area", price_areas, index=0, key="p4_area")
+
+    pie_data = (df[df["pricearea"] == area]
+                .groupby("productiongroup", as_index=False)["quantitykwh"]
+                .sum().sort_values("quantitykwh", ascending=False))
+    if pie_data.empty:
+        st.info("No data for selected area.")
+    else:
+        st.plotly_chart(
+            px.pie(pie_data, values="quantitykwh", names="productiongroup",
+                   title=f"Production share — {area}"),
+            use_container_width=True
         )
 
-        # Filter: by area + month + groups
-        f = df[(df["pricearea"] == area) & (df["month"] == sel_month)]
-        if selected_groups:
-            f = f[f["productiongroup"].isin(selected_groups)]
+# Right: pills/multiselect + month + line
+with right:
+    st.subheader("Groups & Monthly Trend")
+    all_groups = sorted(df["productiongroup"].dropna().unique())
+    if hasattr(st, "pills"):
+        groups = st.pills("Production group(s)", options=all_groups, selection_mode="multi",
+                          default=all_groups, key="p4_groups")
+    else:
+        groups = st.multiselect("Production group(s)", options=all_groups,
+                                default=all_groups, key="p4_groups")
 
-        # Line plot (hourly trend for selected month/groups)
-        if f.empty:
-            st.info("No rows for this combination of price area, groups, and month.")
-        else:
-            line_data = (
-                f.groupby(["starttime", "productiongroup"], as_index=False)["quantitykwh"]
-                 .sum()
-                 .sort_values("starttime")
-            )
-            fig_line = px.line(
-                line_data,
-                x="starttime",
-                y="quantitykwh",
-                color="productiongroup",
-                title=f"Hourly production — {area} — {month_names[sel_month]}",
-            )
-            fig_line.update_layout(legend_title_text="Group")
-            st.plotly_chart(fig_line, use_container_width=True)
+    sel_month = st.selectbox("Month", options=list(month_names.keys()),
+                             index=0, format_func=lambda m: month_names[m], key="p4_month")
 
-    # -------- Expander below the two columns ------------------------------------
-    with st.expander("ℹ️ About the data"):
-        st.markdown(
-            """
-            **Source:** Elhub Energy Data API (dataset: `PRODUCTION_PER_GROUP_MBA_HOUR`).  
-            The data is preprocessed and stored in MongoDB, then loaded into this app.  
-            Charts show hourly production in kWh, aggregated by price area and production group.
-            """
+    f = df[(df["pricearea"] == area) & (df["month"] == sel_month)]
+    if groups:
+        f = f[f["productiongroup"].isin(groups)]
+
+    if f.empty:
+        st.info("No rows for this combination of area, groups, and month.")
+    else:
+        line_data = (f.groupby(["starttime","productiongroup"], as_index=False)["quantitykwh"]
+                     .sum().sort_values("starttime"))
+        st.plotly_chart(
+            px.line(line_data, x="starttime", y="quantitykwh", color="productiongroup",
+                    title=f"Hourly production — {area} — {month_names[sel_month]}"),
+            use_container_width=True
         )
+
+# Expander
+with st.expander("ℹ️ About the data"):
+    st.markdown(
+        """
+        **Source:** Elhub Energy Data API (`PRODUCTION_PER_GROUP_MBA_HOUR`).  
+        Data stored in MongoDB (database: `elhub`, collection: `df_clean`).  
+        Charts show hourly production (kWh) by price area and group.
+        """
+    )
