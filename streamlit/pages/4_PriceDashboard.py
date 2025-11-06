@@ -48,15 +48,19 @@ month_names = {
 
 left, right = st.columns(2, gap="large")
 
-# Left: area radio + pie
+# ---------------- Left: area radio + pie ----------------
 with left:
     st.subheader("Area & Composition")
     price_areas = sorted(df["pricearea"].dropna().unique())
     area = st.radio("Select price area", price_areas, index=0, key="p4_area")
 
-    pie_data = (df[df["pricearea"] == area]
-                .groupby("productiongroup", as_index=False)["quantitykwh"]
-                .sum().sort_values("quantitykwh", ascending=False))
+    area_df = df[df["pricearea"] == area]
+
+    pie_data = (
+        area_df.groupby("productiongroup", as_index=False)["quantitykwh"]
+        .sum()
+        .sort_values("quantitykwh", ascending=False)
+    )
     if pie_data.empty:
         st.info("No data for selected area.")
     else:
@@ -66,41 +70,62 @@ with left:
             use_container_width=True
         )
 
-# Right: pills/multiselect + month + line
+# --------------- Right: pills + month + line ---------------
 with right:
     st.subheader("Groups & Monthly Trend")
-    all_groups = sorted(df["productiongroup"].dropna().unique())
+
+    # Months actually present for this area
+    months_avail = sorted(area_df["month"].dropna().unique().tolist())
+    month_options = [0] + months_avail          # 0 = All months
+    month_labels  = {0: "All months", **{m: month_names[m] for m in months_avail}}
+
+    # Default to the latest month available
+    default_month_index = 0 if not months_avail else month_options.index(months_avail[-1])
+
+    sel_month = st.selectbox(
+        "Month",
+        options=month_options,
+        index=default_month_index,
+        format_func=lambda m: month_labels.get(m, str(m)),
+        key="p4_month",
+    )
+
+    # Narrow the dataframe by month (if not "All")
+    filt_df = area_df if sel_month == 0 else area_df[area_df["month"] == sel_month]
+
+    # Groups actually present given area(+month)
+    groups_avail = sorted(filt_df["productiongroup"].dropna().unique().tolist())
+
     if hasattr(st, "pills"):
-        groups = st.pills("Production group(s)", options=all_groups, selection_mode="multi",
-                          default=all_groups, key="p4_groups")
+        groups = st.pills("Production group(s)", options=groups_avail,
+                          selection_mode="multi", default=groups_avail, key="p4_groups")
     else:
-        groups = st.multiselect("Production group(s)", options=all_groups,
-                                default=all_groups, key="p4_groups")
+        groups = st.multiselect("Production group(s)", options=groups_avail,
+                                default=groups_avail, key="p4_groups")
 
-    sel_month = st.selectbox("Month", options=list(month_names.keys()),
-                             index=0, format_func=lambda m: month_names[m], key="p4_month")
-
-    f = df[(df["pricearea"] == area) & (df["month"] == sel_month)]
     if groups:
-        f = f[f["productiongroup"].isin(groups)]
+        filt_df = filt_df[filt_df["productiongroup"].isin(groups)]
 
-    if f.empty:
+    if filt_df.empty:
         st.info("No rows for this combination of area, groups, and month.")
     else:
-        line_data = (f.groupby(["starttime","productiongroup"], as_index=False)["quantitykwh"]
-                     .sum().sort_values("starttime"))
+        line_data = (
+            filt_df.groupby(["starttime", "productiongroup"], as_index=False)["quantitykwh"]
+            .sum().sort_values("starttime")
+        )
+        title_month = month_labels[sel_month]
         st.plotly_chart(
             px.line(line_data, x="starttime", y="quantitykwh", color="productiongroup",
-                    title=f"Hourly production — {area} — {month_names[sel_month]}"),
+                    title=f"Hourly production — {area} — {title_month}"),
             use_container_width=True
         )
 
-# Expander
+# --------------- Expander ---------------
 with st.expander("ℹ️ About the data"):
     st.markdown(
         """
         **Source:** Elhub Energy Data API (`PRODUCTION_PER_GROUP_MBA_HOUR`).  
         Data stored in MongoDB (database: `elhub`, collection: `df_clean`).  
-        Charts show hourly production (kWh) by price area and group.
+        Charts show hourly production (kWh) by price area and production group.
         """
     )

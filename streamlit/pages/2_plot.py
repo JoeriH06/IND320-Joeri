@@ -10,7 +10,7 @@ st.write("ℹ️ Plot the imported data with column and month selection.")
 def load_data() -> pd.DataFrame:
     # Here we load the dataset from the subfolder and use caching for efficiency
     # pages -> streamlit -> Data/open-meteo-subset.csv
-    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open-meteo-subset.csv"
+    csv_path = Path(__file__).resolve().parents[1] / "Data" / "open_meteo_clean.csv"
 
     # Here we do a quick existence check to surface a clear error if the file is missing
     if not csv_path.exists():
