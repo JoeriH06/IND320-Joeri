@@ -7,7 +7,7 @@ col1, col2 = st.columns([2, 3])
 with col1:
     st.image(
         "https://framerusercontent.com/images/uWEtm8wdAW1prhgeNYuzWf2gESQ.png?width=500&height=500",
-        use_container_width=True,
+        use_column_width=True,
     )
 
 with col2:

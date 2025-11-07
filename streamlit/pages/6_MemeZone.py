@@ -30,7 +30,8 @@ with left:
             st.session_state["meme_url"] = random.choice(available)
             
 # Displaying the meme
-with right:
-    st.subheader("Here's your meme:")
-    meme_url = st.session_state.get("meme_url", random.choice(memes))
+try:
     st.image(meme_url, use_container_width=True)
+except TypeError:
+    # Older Streamlit
+    st.image(meme_url, use_column_width=True)
