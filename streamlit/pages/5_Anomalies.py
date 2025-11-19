@@ -1,7 +1,7 @@
 import streamlit as st, numpy as np, pandas as pd
 from scipy.fft import dct, idct
 from sklearn.neighbors import LocalOutlierFactor
-
+import altair as alt
 
 st.title("Outliers & Anomalies (Weather)")
 
@@ -58,9 +58,38 @@ with tab_out:
     coeffs = dct(temp, norm="ortho"); hp = coeffs.copy(); hp[:k] = 0; satv = idct(hp, norm="ortho")
     med = np.median(satv); mad = np.median(np.abs(satv-med)); rstd = 1.4826*mad or (np.std(satv) or 1e-9)
     lo, hi = med - n_std*rstd, med + n_std*rstd
-    mask = (satv<lo)|(satv>hi)
-    st.line_chart(df[["temperature_2m"]], use_container_width=True)
+    mask = (satv < lo) | (satv > hi)
+    # Build a dataframe for plotting
+    spc_df = df[["temperature_2m"]].copy()
+    spc_df["time"] = spc_df.index
+    spc_df["outlier"] = mask
+
+    # Base temperature line
+    base = (
+        alt.Chart(spc_df)
+        .mark_line()
+        .encode(
+            x=alt.X("time:T", title="Time"),
+            y=alt.Y("temperature_2m:Q", title="Temperature (°C)")
+        )
+    )
+
+    # Red circles on outlier points
+    outliers_layer = (
+        alt.Chart(spc_df[spc_df["outlier"]])
+        .mark_circle(size=40, color="red")
+        .encode(
+            x="time:T",
+            y="temperature_2m:Q",
+            tooltip=["time:T", "temperature_2m:Q"]
+        )
+    )
+
+    st.altair_chart(base + outliers_layer, use_container_width=True)
+
     st.metric("Outliers", int(mask.sum()))
+
+    
     with st.expander("Show outlier timestamps"):
         st.dataframe(pd.DataFrame({"time": df.index[mask], "temperature_2m": df["temperature_2m"][mask]}).reset_index(drop=True), use_container_width=True)
 
@@ -71,7 +100,30 @@ with tab_lof:
     lof = LocalOutlierFactor(contamination=prop)
     pred = lof.fit_predict(z)  # -1 outlier
     mask = pred == -1
-    st.line_chart(df[["precipitation"]], use_container_width=True)
+    lof_df = df[["precipitation"]].copy()
+    lof_df["time"] = lof_df.index
+    lof_df["outlier"] = mask
+
+    base_p = (
+        alt.Chart(lof_df)
+        .mark_line()
+        .encode(
+            x=alt.X("time:T", title="Time"),
+            y=alt.Y("precipitation:Q", title="Precipitation (mm)")
+        )
+    )
+
+    outliers_p = (
+        alt.Chart(lof_df[lof_df["outlier"]])
+        .mark_circle(size=40, color="red")
+        .encode(
+            x="time:T",
+            y="precipitation:Q",
+            tooltip=["time:T", "precipitation:Q"]
+        )
+    )
+
+    st.altair_chart(base_p + outliers_p, use_container_width=True)
     st.metric("Anomalies", int(mask.sum()))
     with st.expander("Show anomaly timestamps"):
         st.dataframe(pd.DataFrame({"time": df.index[mask], "precipitation": df["precipitation"][mask]}).reset_index(drop=True), use_container_width=True)
