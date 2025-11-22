@@ -9,8 +9,8 @@ import plotly.express as px
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
-st.set_page_config(page_title="Sliding Correlation – Meteorology & Energy", layout="wide")
-st.title("Sliding Window Correlation – Meteorology & Energy Production")
+st.set_page_config(page_title="A3 – Sliding Correlation", layout="wide")
+st.title("A3 – Sliding Correlation (Meteorology ↔ Energy)")
 
 st.markdown(
     """

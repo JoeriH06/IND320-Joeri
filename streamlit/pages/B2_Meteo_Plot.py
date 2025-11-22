@@ -3,8 +3,8 @@ import pandas as pd
 import altair as alt
 from pathlib import Path
 
-st.title("Plot")
-st.write("ℹ️ Plot the imported data with column and month selection.")
+st.set_page_config(page_title="B2 – Meteorology Plot", layout="wide")
+st.title("B2 – Meteorology Plot (Weather Trends & Variables)")
 
 @st.cache_data
 def load_data() -> pd.DataFrame:

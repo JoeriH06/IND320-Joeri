@@ -3,8 +3,8 @@ import random
 
 st.set_page_config(page_title="Meme Page", page_icon="😂", layout="centered")
 
-st.title("Meme Zone")
-st.write("Because every project deserves a laugh. And I need some practice ;)")
+st.set_page_config(page_title="C2 – Meme Zone", layout="wide")
+st.title("C2 – Meme Zone (For Science)")
 
 # List of meme URLs (feel free to swap these)
 memes = [

@@ -7,8 +7,8 @@ from pathlib import Path
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
-st.set_page_config(page_title="Map & Energy", layout="wide")
-st.title("Map & Energy – Price areas NO1–NO5")
+st.set_page_config(page_title="A2 – Map & Energy", layout="wide")
+st.title("A2 – Map & Energy (Price areas NO1–NO5)")
 
 st.markdown(
     """

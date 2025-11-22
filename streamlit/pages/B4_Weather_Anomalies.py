@@ -6,7 +6,8 @@ import altair as alt
 from scipy.fft import dct, idct
 from sklearn.neighbors import LocalOutlierFactor
 
-st.title("Outliers & Anomalies (Weather)")
+st.set_page_config(page_title="B4 – Weather Anomalies", layout="wide")
+st.title("B4 – Weather & Production Anomalies (DCT / SPC / LOF)")
 
 # --- Common helpers (paste into pages that need weather) ---
 

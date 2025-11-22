@@ -4,8 +4,8 @@ import plotly.express as px
 from pymongo import MongoClient
 import certifi
 
-st.set_page_config(page_title="Price Dashboard", layout="wide")
-
+st.set_page_config(page_title="A1 – Price Dashboard", layout="wide")
+st.title("A1 – Price Dashboard (Elhub production)")
 
 @st.cache_data(ttl=300, show_spinner=True)
 def load_df_from_mongo() -> pd.DataFrame:

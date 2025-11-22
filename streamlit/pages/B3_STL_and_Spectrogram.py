@@ -4,7 +4,8 @@ from scipy.signal import spectrogram
 from pymongo import MongoClient
 import certifi, numpy as np
 
-st.title("STL & Spectrogram")
+st.set_page_config(page_title="B3 – STL & Spectrogram", layout="wide")
+st.title("B3 – STL Decomposition & Spectrogram (Energy Series)")
 
 @st.cache_data(ttl=300, show_spinner=True)
 def load_mongo_df() -> pd.DataFrame:

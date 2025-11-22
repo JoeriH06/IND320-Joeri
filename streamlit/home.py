@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 st.set_page_config(
     page_title="IND320 – Energy & Weather Analytics",
     page_icon="📊",
@@ -7,11 +8,28 @@ st.set_page_config(
 )
 
 # ---- Header ----
-st.title("IND320 – Energy & Weather Analytics")
+st.set_page_config(page_title="Home – IND320 Project", page_icon="📊", layout="centered")
+st.title("IND320 – Interactive Energy & Meteorology Dashboard")
+
 st.markdown(
     "<p style='color: gray;'>Streamlit interface for production, consumption, "
     "meteorology and forecasting tasks.</p>",
     unsafe_allow_html=True,
+)
+
+st.subheader("How the app is organised")
+
+st.markdown(
+    """
+### A – Energy production & consumption
+Pages A1–A4 use Elhub data (Bronze–Silver–Gold pipeline) to analyse production and consumption.
+
+### B – Meteorology & anomalies
+Pages B1–B4 focus on meteorological data (Open-Meteo, ERA5) and anomaly detection.
+
+### C – Snow & misc
+Pages C1–C2 cover snow drift (Tabler 2003) and an informal meme page.
+"""
 )
 
 st.divider()
@@ -51,6 +69,7 @@ st.markdown(
     - **Meme Zone** – Informal content related to the project.
     """
 )
+
 
 st.info(
     "Tip: Start with **Price Dashboard** or **Map & Choropleth** to get an overview of "

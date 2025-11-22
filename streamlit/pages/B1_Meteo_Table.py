@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
-st.title("Table")
-st.write("ℹ️ One row per series, with a mini line chart for the first month.")
+st.set_page_config(page_title="B1 – Meteorology Table", layout="wide")
+st.title("B1 – Meteorology Table (Open-Meteo / ERA5)")
 
 @st.cache_data
 def load_data() -> pd.DataFrame:

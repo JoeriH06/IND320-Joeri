@@ -9,8 +9,8 @@ from datetime import date
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
-st.set_page_config(page_title="Snow drift & Wind Rose", layout="wide")
-st.title("Snow Drift Calculation & Wind Rose")
+st.set_page_config(page_title="C1 – Snow Drift & Wind Rose", layout="wide")
+st.title("C1 – Snow Drift & Wind Rose (Tabler 2003)")
 
 st.markdown(
     """
@@ -20,8 +20,8 @@ meteorological data from the **Open-Meteo ERA5 archive**.
 - A **season** is defined as **1 July – 30 June** (next year)
 - Snowfall counts when **temperature < +1 °C**
 - You can choose a **year range** and a **fence type**
-- Results are expressed as **Qt (kg/m)** and **tonnes/m**, with
-  corresponding **fence height** per season.
+- Results include **yearly** and **monthly** Qt, with corresponding **fence height**
+  and an **average wind rose**.
     """
 )
 
@@ -43,31 +43,23 @@ lat0, lon0 = coord
 st.info(f"Using coordinate from map page: **lat = {lat0:.4f}, lon = {lon0:.4f}**")
 
 # ---------------------------------------------------------
-# Parameters (Tabler 2003, as in supplied script)
+# Parameters (Tabler 2003)
 # ---------------------------------------------------------
 DEFAULT_T = 3000       # Maximum transport distance [m]
 DEFAULT_F = 30000      # Fetch distance [m]
 DEFAULT_THETA = 0.5    # Relocation coefficient
 
 # ---------------------------------------------------------
-# Snow-drift core functions (adapted from Snow_drift.py)
+# Snow-drift core functions
 # ---------------------------------------------------------
-
 def compute_Qupot(hourly_wind_speeds, dt=3600):
-    """
-    Potential wind-driven snow transport (Qupot) [kg/m], using u^3.8.
-    """
     total = sum((u ** 3.8) * dt for u in hourly_wind_speeds) / 233_847
     return total
 
 def sector_index(direction):
-    """Return 0–15 index for a 16-sector rose."""
     return int(((direction + 11.25) % 360) // 22.5)
 
 def compute_sector_transport(hourly_wind_speeds, hourly_wind_dirs, dt=3600):
-    """
-    Cumulative transport for each of 16 wind sectors [kg/m].
-    """
     sectors = [0.0] * 16
     for u, d in zip(hourly_wind_speeds, hourly_wind_dirs):
         idx = sector_index(d)
@@ -75,14 +67,9 @@ def compute_sector_transport(hourly_wind_speeds, hourly_wind_dirs, dt=3600):
     return sectors
 
 def compute_snow_transport(T, F, theta, Swe, hourly_wind_speeds, dt=3600):
-    """
-    Snow drifting according to Tabler (2003).
-
-    Returns dict with Qupot, Qspot, Srwe, Qinf, Qt and control type.
-    """
     Qupot = compute_Qupot(hourly_wind_speeds, dt)
-    Qspot = 0.5 * T * Swe       # Snowfall-limited [kg/m]
-    Srwe = theta * Swe          # Relocated water equivalent [mm]
+    Qspot = 0.5 * T * Swe
+    Srwe = theta * Swe
 
     if Qupot > Qspot:
         Qinf = 0.5 * T * Srwe
@@ -102,65 +89,59 @@ def compute_snow_transport(T, F, theta, Swe, hourly_wind_speeds, dt=3600):
         "Control": control,
     }
 
-def compute_yearly_results(df, T, F, theta):
-    """
-    Compute seasonal snow drift parameters for each July–June season.
-
-    df must have columns:
-      - time (datetime index or column)
-      - temperature_2m
-      - precipitation
-      - windspeed_10m
-    """
+def compute_year_and_month_results(df, T, F, theta):
+    """Compute yearly and monthly snow drift for each July–June season."""
     if "time" not in df.columns:
         df = df.reset_index().rename(columns={"index": "time"})
-
     df = df.copy()
     df["time"] = pd.to_datetime(df["time"])
-    # season year: July–Dec → current year, Jan–Jun → previous year
-    df["season"] = df["time"].apply(lambda dt: dt.year if dt.month >= 7 else dt.year - 1)
+    df["season_year"] = df["time"].apply(lambda dt: dt.year if dt.month >= 7 else dt.year - 1)
+    df["month"] = df["time"].dt.month
 
-    seasons = sorted(df["season"].unique())
-    results = []
+    yearly_rows = []
+    monthly_rows = []
 
-    for s in seasons:
-        season_start = pd.Timestamp(year=s, month=7, day=1)
-        season_end = pd.Timestamp(year=s + 1, month=6, day=30, hour=23, minute=59)
-        df_season = df[(df["time"] >= season_start) & (df["time"] <= season_end)]
+    for s, df_season in df.groupby("season_year"):
         if df_season.empty:
             continue
 
-        # hourly Swe: precipitation when T < +1°C
+        df_season = df_season.copy()
         df_season["Swe_hourly"] = np.where(
             df_season["temperature_2m"] < 1.0,
             df_season["precipitation"],
             0.0,
         )
-        total_Swe = df_season["Swe_hourly"].sum()    # mm
+
+        # Yearly totals
+        total_Swe = df_season["Swe_hourly"].sum()
         wind_speeds = df_season["windspeed_10m"].tolist()
+        year_res = compute_snow_transport(T, F, theta, total_Swe, wind_speeds)
+        year_res["season"] = f"{s}-{s + 1}"
+        yearly_rows.append(year_res)
 
-        res = compute_snow_transport(T, F, theta, total_Swe, wind_speeds)
-        res["season"] = f"{s}-{s + 1}"
-        results.append(res)
+        # Monthly within season (July–June)
+        for m, df_month in df_season.groupby("month"):
+            df_month = df_month.copy()
+            Swe_m = df_month["Swe_hourly"].sum()
+            ws_m = df_month["windspeed_10m"].tolist()
+            if Swe_m == 0 or len(ws_m) == 0:
+                continue
+            m_res = compute_snow_transport(T, F, theta, Swe_m, ws_m)
+            m_res["season"] = f"{s}-{s + 1}"
+            m_res["month"] = m
+            monthly_rows.append(m_res)
 
-    return pd.DataFrame(results)
+    yearly_df = pd.DataFrame(yearly_rows)
+    monthly_df = pd.DataFrame(monthly_rows)
+    return yearly_df, monthly_df
 
 def compute_average_sector(df):
-    """
-    Average directional breakdown over all seasons (16 sectors).
-    df must have:
-      - time
-      - temperature_2m
-      - precipitation
-      - windspeed_10m
-      - winddirection_10m
-    """
     df = df.copy()
     df["time"] = pd.to_datetime(df["time"])
-    df["season"] = df["time"].apply(lambda dt: dt.year if dt.month >= 7 else dt.year - 1)
+    df["season_year"] = df["time"].apply(lambda dt: dt.year if dt.month >= 7 else dt.year - 1)
 
     sectors_list = []
-    for s, group in df.groupby("season"):
+    for _, group in df.groupby("season_year"):
         group = group.copy()
         group["Swe_hourly"] = np.where(
             group["temperature_2m"] < 1.0,
@@ -174,13 +155,9 @@ def compute_average_sector(df):
 
     if not sectors_list:
         return np.zeros(16)
-
     return np.mean(sectors_list, axis=0)
 
 def compute_fence_height(Qt, fence_type):
-    """
-    Necessary effective fence height (m) for a given Qt (kg/m).
-    """
     Qt_tonnes = Qt / 1000.0
     ft = fence_type.lower()
     if ft == "wyoming":
@@ -191,20 +168,16 @@ def compute_fence_height(Qt, fence_type):
         factor = 2.9
     else:
         raise ValueError("Unsupported fence type. Choose 'Wyoming', 'Slat-and-wire', or 'Solid'.")
-
     H = (Qt_tonnes / factor) ** (1 / 2.2)
     return H
 
 # ---------------------------------------------------------
-# Open-Meteo ERA5 loader
+# ERA5 loader
 # ---------------------------------------------------------
 ERA5_URL = "https://archive-api.open-meteo.com/v1/era5"
 
 @st.cache_data(show_spinner=True)
 def fetch_era5_hourly(lat, lon, start_date, end_date, tz="UTC"):
-    """
-    Fetch hourly ERA5 data for snow-drift variables.
-    """
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -225,24 +198,22 @@ def fetch_era5_hourly(lat, lon, start_date, end_date, tz="UTC"):
     h = r.json().get("hourly", {})
     df = pd.DataFrame(h)
     df["time"] = pd.to_datetime(df["time"])
-    # rename to simpler names used above
     return df[["time", "temperature_2m", "precipitation", "windspeed_10m", "winddirection_10m"]]
 
 # ---------------------------------------------------------
-# UI – controls
+# UI controls
 # ---------------------------------------------------------
 left, right = st.columns([1.1, 1.9])
 
 with left:
     st.subheader("Settings")
 
-    # year range for seasons
     current_year = date.today().year
     start_year, end_year = st.select_slider(
         "Season range (July–June)",
         options=list(range(current_year - 10, current_year + 1)),
         value=(current_year - 4, current_year - 1),
-        help="Example: selecting 2020–2023 gives seasons 2020–2021, …, 2023–2024.",
+        help="Example: 2020–2023 gives seasons 2020–2021, …, 2023–2024.",
     )
 
     fence_type = st.selectbox(
@@ -266,7 +237,6 @@ if not run_btn:
         st.info("Choose a season range and parameters on the left, then click **Compute snow drift**.")
     st.stop()
 
-# determine full date span needed (1 July start_year → 30 June end_year+1)
 start_date_str = f"{start_year}-07-01"
 end_date_str = f"{end_year + 1}-06-30"
 
@@ -281,11 +251,11 @@ if met_df.empty:
     st.error("No meteorological data returned for this period and location.")
     st.stop()
 
-with st.spinner("Computing seasonal snow drift and wind rose…"):
-    yearly_df = compute_yearly_results(met_df, T, F, theta)
-    # filter to requested seasons
-    mask = yearly_df["season"].apply(lambda s: int(s.split("-")[0]) >= start_year and int(s.split("-")[0]) <= end_year)
-    yearly_df = yearly_df.loc[mask].reset_index(drop=True)
+with st.spinner("Computing seasonal and monthly snow drift & wind rose…"):
+    yearly_df, monthly_df = compute_year_and_month_results(met_df, T, F, theta)
+    if not yearly_df.empty:
+        mask = yearly_df["season"].apply(lambda s: int(s.split("-")[0]) >= start_year and int(s.split("-")[0]) <= end_year)
+        yearly_df = yearly_df.loc[mask].reset_index(drop=True)
 
     avg_sectors = compute_average_sector(met_df)
 
@@ -293,10 +263,7 @@ if yearly_df.empty:
     st.warning("No seasons found in the selected range after processing.")
     st.stop()
 
-# add convenience columns
 yearly_df["Qt (tonnes/m)"] = yearly_df["Qt (kg/m)"] / 1000.0
-
-# fence heights
 heights = []
 for _, row in yearly_df.iterrows():
     Qt_val = row["Qt (kg/m)"]
@@ -306,6 +273,15 @@ yearly_df[f"{fence_type} fence height (m)"] = heights
 
 overall_avg = yearly_df["Qt (kg/m)"].mean()
 overall_avg_tonnes = overall_avg / 1000.0
+
+# monthly formatting
+if not monthly_df.empty:
+    monthly_df["Qt (tonnes/m)"] = monthly_df["Qt (kg/m)"] / 1000.0
+    monthly_df["season_year"] = monthly_df["season"].str.slice(0, 4).astype(int)
+    monthly_df = monthly_df[
+        (monthly_df["season_year"] >= start_year) &
+        (monthly_df["season_year"] <= end_year)
+    ]
 
 # ---------------------------------------------------------
 # Right column – plots and tables
@@ -317,7 +293,6 @@ with right:
         f"Overall average Qt over selected seasons: **{overall_avg_tonnes:.1f} tonnes/m**"
     )
 
-    # bar chart of Qt per season
     fig_bar = px.bar(
         yearly_df,
         x="season",
@@ -327,7 +302,6 @@ with right:
     )
     st.plotly_chart(fig_bar, use_container_width=True)
 
-    # table
     st.markdown("**Table of seasons and fence heights**")
     display_cols = ["season", "Qt (tonnes/m)", "Control", f"{fence_type} fence height (m)"]
     st.dataframe(
@@ -337,7 +311,39 @@ with right:
         use_container_width=True,
     )
 
-    # wind rose (Plotly)
+    # Monthly Qt plot
+    if not monthly_df.empty:
+        st.subheader("Monthly snow drift within seasons")
+
+        month_name = {
+            1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr",
+            5: "May", 6: "Jun", 7: "Jul", 8: "Aug",
+            9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec",
+        }
+        monthly_df["month_name"] = monthly_df["month"].map(month_name)
+
+        fig_month = px.bar(
+            monthly_df,
+            x="month_name",
+            y="Qt (tonnes/m)",
+            color="season",
+            barmode="group",
+            labels={
+                "month_name": "Month",
+                "Qt (tonnes/m)": "Qt [tonnes/m]",
+                "season": "Season",
+            },
+            title="Monthly snow transport within each July–June season",
+        )
+        st.plotly_chart(fig_month, use_container_width=True)
+
+        with st.expander("Monthly snow drift data"):
+            st.dataframe(
+                monthly_df[["season", "month_name", "Qt (tonnes/m)", "Control"]],
+                use_container_width=True,
+            )
+
+    # wind rose
     st.subheader("Average directional distribution (wind rose)")
 
     num_sectors = 16
@@ -348,8 +354,7 @@ with right:
         "W", "WNW", "NW", "NNW",
     ]
     angles_deg = np.arange(0, 360, 360 / num_sectors)
-
-    avg_sectors_tonnes = avg_sectors / 1000.0  # kg/m → tonnes/m
+    avg_sectors_tonnes = avg_sectors / 1000.0
 
     fig_rose = go.Figure()
     fig_rose.add_trace(
@@ -367,7 +372,7 @@ with right:
                 tickvals=angles_deg,
                 ticktext=directions,
                 direction="clockwise",
-                rotation=90,  # 0° at north
+                rotation=90,
             )
         ),
         title=f"Average snow transport by direction<br>Overall Qt: {overall_avg_tonnes:.1f} tonnes/m",
