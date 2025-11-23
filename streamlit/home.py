@@ -2,14 +2,13 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="IND320 – Energy & Weather Analytics",
+    page_title="IND320 - Energy & Weather Analytics",
     page_icon="📊",
     layout="centered",
 )
 
 # ---- Header ----
-st.set_page_config(page_title="Home – IND320 Project", page_icon="📊", layout="centered")
-st.title("IND320 – Interactive Energy & Meteorology Dashboard")
+st.title("IND320 - Interactive Energy & Meteorology Dashboard")
 
 st.markdown(
     "<p style='color: gray;'>Streamlit interface for production, consumption, "
@@ -21,14 +20,14 @@ st.subheader("How the app is organised")
 
 st.markdown(
     """
-### A – Energy production & consumption
-Pages A1–A4 use Elhub data (Bronze–Silver–Gold pipeline) to analyse production and consumption.
+### A - Energy production & consumption
+Pages A1-A4 use Elhub data (Bronze-Silver-Gold pipeline) to analyse production and consumption.
 
-### B – Meteorology & anomalies
-Pages B1–B4 focus on meteorological data (Open-Meteo, ERA5) and anomaly detection.
+### B - Meteorology & anomalies
+Pages B1-B4 focus on meteorological data (Open-Meteo, ERA5) and anomaly detection.
 
-### C – Snow & misc
-Pages C1–C2 cover snow drift (Tabler 2003) and an informal meme page.
+### C - Snow & misc
+Pages C1-C2 cover snow drift (Tabler 2003) and an informal meme page.
 """
 )
 
@@ -55,18 +54,18 @@ st.subheader("Navigation overview")
 st.markdown(
     """
     ### 1. Energy production & consumption
-    - **Price Dashboard** – Hourly production by price area and group (MongoDB-backed).
-    - **Map & Choropleth** – Price area overview with group and time selection.
-    - **Sliding Correlation** – Correlation between meteorological variables and energy.
-    - **Forecasting (SARIMAX)** – Configurable time-series models with confidence intervals.
+    - **Price Dashboard** - Hourly production by price area and group (MongoDB-backed).
+    - **Map & Choropleth** - Price area overview with group and time selection.
+    - **Sliding Correlation** - Correlation between meteorological variables and energy.
+    - **Forecasting (SARIMAX)** - Configurable time-series models with confidence intervals.
 
     ### 2. Meteorology & anomalies
-    - **Table / Plot** – Cleaned Open-Meteo data for inspection and basic analysis.
-    - **STL & Spectrogram** – Decomposition and frequency analysis of production series.
-    - **Outliers & Anomalies (Weather)** – Detection of unusual conditions using DCT/SPC and LOF.
+    - **Table / Plot** - Cleaned Open-Meteo data for inspection and basic analysis.
+    - **STL & Spectrogram** - Decomposition and frequency analysis of production series.
+    - **Outliers & Anomalies (Weather)** - Detection of unusual conditions using DCT/SPC and LOF.
 
     ### 3. Miscellaneous
-    - **Meme Zone** – Informal content related to the project.
+    - **Meme Zone** - Informal content related to the project.
     """
 )
 
@@ -77,4 +76,4 @@ st.info(
 )
 
 st.divider()
-st.caption("IND320 project – Joeri Harreman, 2025")
+st.caption("IND320 project - Joeri Harreman, 2025")
