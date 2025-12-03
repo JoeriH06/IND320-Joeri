@@ -8,19 +8,6 @@ st.set_page_config(
     layout="centered",
 )
 
-st.markdown("""
-<style>
-    section[data-testid="stSidebar"] {
-        display: none !important;
-    }
-    div[data-testid="stAppViewContainer"] {
-        margin-left: 0 !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 navigation()
 
 

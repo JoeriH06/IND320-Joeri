@@ -4,12 +4,6 @@ import altair as alt
 from pathlib import Path
 from sidebar import navigation
 
-st.markdown("""
-    <style>
-        section[data-testid="stSidebar"] {display: none;}
-    </style>
-""", unsafe_allow_html=True)
-
 # ---------------------------------------------------------
 # Page Setup
 # ---------------------------------------------------------

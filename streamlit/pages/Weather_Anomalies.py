@@ -7,13 +7,6 @@ from scipy.fft import dct, idct
 from sklearn.neighbors import LocalOutlierFactor
 from sidebar import navigation
 
-st.markdown("""
-    <style>
-        section[data-testid="stSidebar"] {display: none;}
-    </style>
-""", unsafe_allow_html=True)
-
-
 # ---------------------------------------------------------
 # PAGE SETUP
 # ---------------------------------------------------------
