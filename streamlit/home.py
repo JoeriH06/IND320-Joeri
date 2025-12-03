@@ -1,6 +1,23 @@
 import streamlit as st
 from sidebar import navigation
 
+# --- HIDE SIDEBAR COMPLETELY ---
+st.markdown("""
+<style>
+    /* Hide entire Streamlit sidebar */
+    section[data-testid="stSidebar"] {
+        display: none !important;
+    }
+
+    /* Expand the main content to full width */
+    div[data-testid="stAppViewContainer"] {
+        margin-left: 0 !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.set_page_config(
     page_title="IND320 - Energy & Weather Analytics",
     page_icon="📊",
