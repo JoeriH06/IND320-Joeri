@@ -8,11 +8,12 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 import plotly.graph_objects as go
 import requests
 from sidebar import navigation
+
 # ---------------------------------------------------------
 # Page config
 # ---------------------------------------------------------
-st.set_page_config(page_title="A4 – Forecasting (SARIMAX)", layout="wide")
-st.title("A4 – Forecasting of Energy Production / Consumption (SARIMAX)")
+st.set_page_config(page_title="Forecasting (SARIMAX)", layout="wide")
+st.title("Forecasting of Energy Production / Consumption (SARIMAX)")
 
 navigation()
 
@@ -83,7 +84,13 @@ df = df.set_index("starttime").sort_index()
 # ERA5 loader
 # ---------------------------------------------------------
 @st.cache_data(show_spinner=True)
-def fetch_era5_hourly(lat: float, lon: float, start_date: str, end_date: str, tz: str = "UTC") -> pd.DataFrame:
+def fetch_era5_hourly(
+    lat: float,
+    lon: float,
+    start_date: str,
+    end_date: str,
+    tz: str = "UTC",
+) -> pd.DataFrame:
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -96,71 +103,86 @@ def fetch_era5_hourly(lat: float, lon: float, start_date: str, end_date: str, tz
     r.raise_for_status()
     hourly = r.json().get("hourly", {})
     df_m = pd.DataFrame(hourly)
-    df_m["time"] = pd.to_datetime(df_m["time"])
+    df_m["time"] = pd.to_datetime(df_m["time"], utc=True)
     return df_m.set_index("time").sort_index()
 
 # ---------------------------------------------------------
-# UI: selectors
+# UI – TOP CONFIGURATION PANEL (full width)
 # ---------------------------------------------------------
-left, right = st.columns([1, 2])
 
-with left:
-    st.subheader("Selection")
+st.subheader("⚙️ Configuration")
 
-    price_area = st.selectbox(
-        "Price area",
-        sorted(df["pricearea"].dropna().unique())
-    )
+# ---- Row 1: main selections ----
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    price_area = st.selectbox("Price area", sorted(df["pricearea"].dropna().unique()))
 
+with c2:
     group = st.selectbox(
         "Production group",
-        ["All"] + sorted(df["productiongroup"].dropna().unique())
+        ["All"] + sorted(df["productiongroup"].dropna().unique()),
     )
 
+with c3:
     freq = st.selectbox("Aggregation", ["Hourly", "Daily"], index=1)
 
-    st.markdown("#### SARIMA Parameters")
-    p = st.number_input("p", 0, 5, 1)
-    d = st.number_input("d", 0, 2, 1)
-    q = st.number_input("q", 0, 5, 1)
-
-    P = st.number_input("P", 0, 3, 1)
-    D = st.number_input("D", 0, 2, 1)
-    Q = st.number_input("Q", 0, 3, 1)
-
-    s = st.number_input(
-        "Seasonal period (s)",
-        0, 400, 24,
-        help="Hourly data: 24. Daily data: 7 (weekly)."
+with c4:
+    horizon = st.number_input(
+        "Forecast horizon (steps)", 1, 300, 48,
+        help="Number of time steps to forecast ahead."
     )
 
-    horizon = st.number_input("Forecast horizon (steps)", 1, 300, 48)
+st.markdown("---")
 
-    # training range
-    min_dt = df.index.min().date()
-    max_dt = df.index.max().date()
-    train_start, train_end = st.date_input(
-        "Training interval",
-        value=(min_dt, max_dt),
-        min_value=min_dt,
-        max_value=max_dt,
-    )
-    if isinstance(train_start, list):
-        train_start, train_end = train_start
+# ---- SARIMA parameters ----
+with st.expander("SARIMAX model parameters (advanced)", expanded=False):
 
-    st.markdown("#### Exogenous meteorological variables (optional)")
-    use_exog = st.checkbox("Include weather as exogenous variables", value=False)
+    st.markdown("#### Non-seasonal (p, d, q)")
+    p_col, d_col, q_col = st.columns(3)
+    with p_col: p = st.number_input("p", 0, 5, 1)
+    with d_col: d = st.number_input("d", 0, 2, 1)
+    with q_col: q = st.number_input("q", 0, 5, 1)
 
-    if use_exog:
-        exog_vars = st.multiselect(
-            "Select meteorological variables",
-            METEO_VARS,
-            default=["temperature_2m"],
-        )
-    else:
-        exog_vars = []
+    st.markdown("#### Seasonal (P, D, Q, s)")
+    P_col, D_col, Q_col, s_col = st.columns(4)
+    with P_col: P = st.number_input("P", 0, 3, 1)
+    with D_col: D = st.number_input("D", 0, 2, 1)
+    with Q_col: Q = st.number_input("Q", 0, 3, 1)
+    with s_col: s = st.number_input("s (period)", 0, 400, 24)
 
-    run_btn = st.button("Run SARIMAX forecast", type="primary")
+st.markdown("---")
+
+# ---- Training interval ----
+st.markdown("### Training interval")
+train_start, train_end = st.date_input(
+    "Training period",
+    value=(df.index.min().date(), df.index.max().date()),
+    min_value=df.index.min().date(),
+    max_value=df.index.max().date(),
+)
+
+st.markdown("---")
+
+# ---- Exogenous variables ----
+st.markdown("### Exogenous meteorological variables (optional)")
+
+use_exog = st.checkbox("Include weather as exogenous variables")
+if use_exog:
+    exog_vars = st.multiselect("Select variables", METEO_VARS, default=["temperature_2m"])
+else:
+    exog_vars = []
+
+st.markdown("---")
+
+# ---- RUN BUTTON ----
+run_btn = st.button("🚀 Run SARIMAX forecast", type="primary", use_container_width=True)
+
+# ---------------------------------------------------------
+# STOP if not run
+# ---------------------------------------------------------
+if not run_btn:
+    st.info("Configure parameters above and click **Run SARIMAX forecast**.")
+    st.stop()
 
 # ---------------------------------------------------------
 # Build energy series
@@ -225,6 +247,8 @@ if use_exog and exog_vars:
     # Ensure timezone alignment
     if exog_all.index.tz is None:
         exog_all.index = exog_all.index.tz_localize("UTC")
+    else:
+        exog_all.index = exog_all.index.tz_convert("UTC")
 
     # Align with y and clean
     exog_train = exog_all.reindex(y.index)
@@ -298,17 +322,31 @@ with st.spinner("Forecasting future steps…"):
     ci = forecast_res.conf_int()
 
 # ---------------------------------------------------------
-# Plot results
+# RESULTS (full width under configuration)
 # ---------------------------------------------------------
-with right:
-    st.subheader("Forecast result")
 
+st.subheader("📊 Results overview")
+
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Training points", len(y))
+c2.metric("Forecast steps", int(horizon))
+c3.metric("Frequency", freq)
+c4.metric("Exogenous", "Yes" if (use_exog and exog_vars) else "No")
+
+st.caption(
+    f"Training period: {train_start} → {train_end} · "
+    f"Area: {price_area} · Group: {group}"
+)
+
+tab_forecast, tab_summary = st.tabs(["Forecast", "Model summary"])
+
+with tab_forecast:
+    st.subheader("Forecast")
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
         x=y.index, y=y, mode="lines",
-        name="Observed",
-        line=dict(width=2)
+        name="Observed", line=dict(width=2)
     ))
 
     fig.add_trace(go.Scatter(
@@ -320,22 +358,19 @@ with right:
     fig.add_trace(go.Scatter(
         x=forecast.index.tolist() + forecast.index[::-1].tolist(),
         y=ci.iloc[:, 0].tolist() + ci.iloc[:, 1][::-1].tolist(),
-        fill="toself",
-        name="Confidence interval",
-        opacity=0.25,
-        line=dict(width=0),
-        hoverinfo="skip",
+        fill="toself", name="Confidence interval",
+        opacity=0.25, line=dict(width=0), hoverinfo="skip",
     ))
 
-    title_suffix = f" – exog: {', '.join(exog_vars)}" if use_exog and exog_vars else ""
+    title_suffix = f" – exog: {', '.join(exog_vars)}" if use_exog else ""
     fig.update_layout(
         title=f"SARIMAX Forecast – {price_area} ({group}){title_suffix}",
         xaxis_title="Time",
         yaxis_title="kWh",
         legend=dict(orientation="h"),
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander("Model summary"):
-        st.text(model.summary())
+with tab_summary:
+    st.subheader("Model summary")
+    st.text(model.summary())
