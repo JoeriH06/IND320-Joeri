@@ -10,8 +10,8 @@ from sidebar import navigation
 # ---------------------------------------------------------
 # PAGE SETUP
 # ---------------------------------------------------------
-st.set_page_config(page_title="B4 – Weather Anomalies", layout="wide")
-st.title("🌡️ B4 – Weather & Production Anomalies (DCT • SPC • LOF)")
+st.set_page_config(page_title="Weather Anomalies", layout="wide")
+st.title("🌡️ Weather & Production Anomalies (DCT • SPC • LOF)")
 
 navigation()
 
