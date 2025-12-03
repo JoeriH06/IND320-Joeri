@@ -5,6 +5,12 @@ from pymongo import MongoClient
 import certifi
 from sidebar import navigation
 
+st.markdown("""
+    <style>
+        section[data-testid="stSidebar"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
+
 # ---------------------- Page Config ----------------------
 st.set_page_config(page_title="Price Dashboard", layout="wide")
 px.defaults.template = "plotly_dark"

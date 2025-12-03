@@ -7,6 +7,12 @@ import plotly.graph_objects as go
 from datetime import date
 from sidebar import navigation
 
+st.markdown("""
+    <style>
+        section[data-testid="stSidebar"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # Page config
 # ---------------------------------------------------------

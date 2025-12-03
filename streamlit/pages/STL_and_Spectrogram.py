@@ -9,6 +9,14 @@ import plotly.graph_objects as go
 import plotly.express as px
 from sidebar import navigation
 from plotly.subplots import make_subplots
+
+st.markdown("""
+    <style>
+        section[data-testid="stSidebar"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
+
+
 # ---------------------------------------------------------
 # Page setup
 # ---------------------------------------------------------

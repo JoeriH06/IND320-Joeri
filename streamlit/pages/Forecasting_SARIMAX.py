@@ -9,6 +9,12 @@ import plotly.graph_objects as go
 import requests
 from sidebar import navigation
 
+st.markdown("""
+    <style>
+        section[data-testid="stSidebar"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # Page config
 # ---------------------------------------------------------
