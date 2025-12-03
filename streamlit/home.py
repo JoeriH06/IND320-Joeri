@@ -1,12 +1,6 @@
 import streamlit as st
 from sidebar import navigation
 
-st.markdown("""
-    <style>
-        section[data-testid="stSidebar"] {display: none;}
-    </style>
-""", unsafe_allow_html=True)
-
 st.set_page_config(
     page_title="IND320 - Energy & Weather Analytics",
     page_icon="📊",
@@ -14,6 +8,12 @@ st.set_page_config(
 )
 
 navigation()
+
+st.markdown("""
+    <style>
+        section[data-testid="stSidebar"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
 
 # ---- Header ----
 st.title("IND320 – Interactive Energy & Meteorology Dashboard")
