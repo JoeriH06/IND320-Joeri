@@ -7,12 +7,14 @@ import certifi
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import plotly.graph_objects as go
 import requests
-
+from sidebar import navigation
 # ---------------------------------------------------------
 # Page config
 # ---------------------------------------------------------
 st.set_page_config(page_title="A4 – Forecasting (SARIMAX)", layout="wide")
 st.title("A4 – Forecasting of Energy Production / Consumption (SARIMAX)")
+
+navigation()
 
 st.markdown(
     """

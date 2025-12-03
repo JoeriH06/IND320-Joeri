@@ -3,12 +3,14 @@ import pandas as pd
 import plotly.express as px
 import json
 from pathlib import Path
-
+from sidebar import navigation
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
 st.set_page_config(page_title="A2 – Map & Energy", layout="wide")
 st.title("A2 – Map & Energy (Price areas NO1–NO5)")
+
+navigation()
 
 st.markdown(
     """

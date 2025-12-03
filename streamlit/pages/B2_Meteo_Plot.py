@@ -2,9 +2,12 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 from pathlib import Path
+from sidebar import navigation
 
 st.set_page_config(page_title="B2 – Meteorology Plot", layout="wide")
 st.title("B2 – Meteorology Plot (Weather Trends & Variables)")
+
+navigation()
 
 @st.cache_data
 def load_data() -> pd.DataFrame:

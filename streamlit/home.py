@@ -1,5 +1,5 @@
 import streamlit as st
-
+from sidebar import navigation
 
 st.set_page_config(
     page_title="IND320 - Energy & Weather Analytics",
@@ -7,73 +7,90 @@ st.set_page_config(
     layout="centered",
 )
 
+navigation()
 # ---- Header ----
-st.title("IND320 - Interactive Energy & Meteorology Dashboard")
-
+st.title("IND320 – Interactive Energy & Meteorology Dashboard")
 st.markdown(
-    "<p style='color: gray;'>Streamlit interface for production, consumption, "
-    "meteorology and forecasting tasks.</p>",
+    "<p style='color: gray; font-size: 1.1rem;'>A unified interface for exploring "
+    "energy production, consumption, meteorology, forecasting, and anomalies.</p>",
     unsafe_allow_html=True,
 )
 
-st.subheader("How the app is organised")
+st.divider()
 
+# ---- How the app is organised ----
+st.subheader("📁 App Structure")
 st.markdown(
     """
-### A - Energy production & consumption
-Pages A1-A4 use Elhub data (Bronze-Silver-Gold pipeline) to analyse production and consumption.
+### **A — Energy production & consumption**
+Analysis of Elhub data (Bronze → Silver → Gold).
 
-### B - Meteorology & anomalies
-Pages B1-B4 focus on meteorological data (Open-Meteo, ERA5) and anomaly detection.
+### **B — Meteorology & anomalies**
+Weather insights based on Open-Meteo and ERA5, including anomaly detection.
 
-### C - Snow & misc
-Pages C1-C2 cover snow drift (Tabler 2003) and an informal meme page.
+### **C — Snow & misc**
+Snow-drift modelling and a light-hearted misc section.
 """
 )
 
 st.divider()
 
-# ---- Short orientation ----
+# ---- What this project contains ----
+st.subheader("🔍 What you can explore")
 st.markdown(
     """
-    This application brings together the main components of the IND320 project:
+This application brings together the main components of the **IND320** project:
 
-    - Ingesting and structuring energy data (Bronze → Silver → Gold)
-    - Combining Elhub data with meteorological data
-    - Analysing anomalies and building forecasting models
+- Structuring & transforming energy data  
+- Integrating meteorology with production & consumption  
+- Detecting anomalies  
+- Building forecasting models  
 
-    Use the **sidebar** to navigate between the different analysis pages.
-    """
+Use the **left sidebar** to navigate through each analysis module.
+"""
 )
 
 st.divider()
 
 # ---- Section overview ----
-st.subheader("Navigation overview")
+st.subheader("🧭 Navigation Overview")
 
-st.markdown(
-    """
-    ### 1. Energy production & consumption
-    - **Price Dashboard** - Hourly production by price area and group (MongoDB-backed).
-    - **Map & Choropleth** - Price area overview with group and time selection.
-    - **Sliding Correlation** - Correlation between meteorological variables and energy.
-    - **Forecasting (SARIMAX)** - Configurable time-series models with confidence intervals.
+col1, col2, col3 = st.columns(3)
 
-    ### 2. Meteorology & anomalies
-    - **Table / Plot** - Cleaned Open-Meteo data for inspection and basic analysis.
-    - **STL & Spectrogram** - Decomposition and frequency analysis of production series.
-    - **Outliers & Anomalies (Weather)** - Detection of unusual conditions using DCT/SPC and LOF.
+with col1:
+    st.markdown(
+        """
+### ⚡ Energy
+- Price Dashboard  
+- Map & Choropleth  
+- Sliding Correlation  
+- SARIMAX Forecasting  
+"""
+    )
 
-    ### 3. Miscellaneous
-    - **Meme Zone** - Informal content related to the project.
-    """
-)
+with col2:
+    st.markdown(
+        """
+### 🌦️ Meteorology
+- Meteo Table  
+- Meteo Plot  
+- STL & Spectrogram  
+- Weather Anomalies  
+"""
+    )
 
+with col3:
+    st.markdown(
+        """
+### ❄️ Misc
+- Snow-Drift Model  
+- Meme Zone  
+"""
+    )
 
 st.info(
-    "Tip: Start with **Price Dashboard** or **Map & Choropleth** to get an overview of "
-    "the data, then move on to correlation and forecasting."
+    "Tip: Start with **Price Dashboard** or **Map & Choropleth** to get an overview of the data."
 )
 
 st.divider()
-st.caption("IND320 project - Joeri Harreman, 2025")
+st.caption("IND320 Project — Joeri Harreman, 2025")

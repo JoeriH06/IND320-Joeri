@@ -3,9 +3,12 @@ import pandas as pd
 import plotly.express as px
 from pymongo import MongoClient
 import certifi
+from sidebar import navigation
 
 st.set_page_config(page_title="A1 – Price Dashboard", layout="wide")
 st.title("A1 – Price Dashboard (Elhub production)")
+
+navigation()
 
 @st.cache_data(ttl=300, show_spinner=True)
 def load_df_from_mongo() -> pd.DataFrame:

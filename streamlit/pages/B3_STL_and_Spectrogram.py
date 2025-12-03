@@ -3,9 +3,12 @@ from statsmodels.tsa.seasonal import STL
 from scipy.signal import spectrogram
 from pymongo import MongoClient
 import certifi, numpy as np
+from sidebar import navigation
 
 st.set_page_config(page_title="B3 – STL & Spectrogram", layout="wide")
 st.title("B3 – STL Decomposition & Spectrogram (Energy Series)")
+
+navigation()
 
 @st.cache_data(ttl=300, show_spinner=True)
 def load_mongo_df() -> pd.DataFrame:

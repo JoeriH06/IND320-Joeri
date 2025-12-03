@@ -5,12 +5,14 @@ import requests
 from pymongo import MongoClient
 import certifi
 import plotly.express as px
-
+from sidebar import navigation
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
 st.set_page_config(page_title="A3 – Sliding Correlation", layout="wide")
 st.title("A3 – Sliding Correlation (Meteorology ↔ Energy)")
+
+navigation()
 
 st.markdown(
     """

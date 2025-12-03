@@ -5,12 +5,14 @@ import requests
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date
-
+from sidebar import navigation
 # ---------------------------------------------------------
 # Page configuration
 # ---------------------------------------------------------
 st.set_page_config(page_title="C1 – Snow Drift & Wind Rose", layout="wide")
 st.title("C1 – Snow Drift & Wind Rose (Tabler 2003)")
+
+navigation()
 
 st.markdown(
     """

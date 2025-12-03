@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+from sidebar import navigation
 
 st.set_page_config(page_title="B1 – Meteorology Table", layout="wide")
 st.title("B1 – Meteorology Table (Open-Meteo / ERA5)")
+
+navigation()
 
 @st.cache_data
 def load_data() -> pd.DataFrame:
